@@ -4,8 +4,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonParser;
 import okhttp3.*;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
 import za.ac.cput.entity.*;
 
 import java.io.IOException;

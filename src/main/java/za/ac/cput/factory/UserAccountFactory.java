@@ -13,7 +13,7 @@ public class UserAccountFactory {
     public static UserAccount buildUserAccount(String userId,
                                                String email,
                                                String password,
-                                               boolean LoginStatus,
+                                               int LoginStatus,
                                                String registerDate)
     {
 

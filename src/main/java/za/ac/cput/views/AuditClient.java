@@ -1,8 +1,9 @@
 package za.ac.cput.views;
 
-import za.ac.cput.entity.Auditor;
-import za.ac.cput.entity.UniversityStaff;
-import za.ac.cput.entity.UserAccount;
+import za.ac.cput.entity.*;
+import za.ac.cput.factory.IssueFactory;
+import za.ac.cput.factory.ReportFactory;
+import za.ac.cput.factory.TicketFactory;
 import za.ac.cput.util.Client;
 
 import javax.swing.*;
@@ -81,8 +82,8 @@ public class AuditClient extends JFrame implements ActionListener {
         this.setVisible(true);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        //userUI();
-        loginForm();
+        userUI();
+        //loginForm();
     }
 
     private void loginForm(){
@@ -134,6 +135,9 @@ public class AuditClient extends JFrame implements ActionListener {
         if(actionEvent.getSource() == btnSignIn) {
             loginAttempt();
         }
+        if(actionEvent.getSource() == btnCreateNewIssue) {
+            validateNewIssue();
+        }
     }
 
     private void clearLoginForm(){
@@ -159,6 +163,7 @@ public class AuditClient extends JFrame implements ActionListener {
         pnlWest.removeAll();
         pnlWest.add(navList);
         userNavListSelection();
+        pnlWest.updateUI();
     }
 
     private void auditorUI(){
@@ -232,48 +237,6 @@ public class AuditClient extends JFrame implements ActionListener {
         DateFormat df = new SimpleDateFormat("dd/MM/yy");
         Date date = new Date();
         return df.format(date);
-    }
-
-    private void createIssueUI(){
-        pnlCenter.removeAll();
-        pnlEast.removeAll();
-        pnlSouth.removeAll();
-
-        txaReport = new JTextArea();
-
-        scroll = new JScrollPane(txaReport);
-        txfTodayDate = new JTextField();
-        lblIssueDescription = new JLabel("Issue Description: ");
-        lblTodayDate = new JLabel("Raised Date: ");
-        JLabel lblIssueArea = new JLabel("Department Area: ");
-        Object areas[] = {"Administrator", "Informatics and Design", "Financial Office", "Housing", "Other"};
-        cmbIssueArea = new JComboBox(areas);
-        btnCreateNewIssue = new JButton("raise issue");
-        pnlCenter.setLayout(new GridLayout(4,1));
-        pnlSouth.setLayout(new GridLayout(1,2));
-
-        JLabel lblConfirm = new JLabel("Submit here >> ");
-
-        pnlCenter.add(lblIssueDescription);
-        pnlCenter.add(scroll);
-        pnlCenter.add(lblIssueArea);
-        pnlCenter.add(cmbIssueArea);
-        pnlCenter.add(lblTodayDate);
-        pnlCenter.add(txfTodayDate);
-
-        lblConfirm.setHorizontalAlignment(JLabel.RIGHT);
-        pnlSouth.add(lblConfirm);
-        pnlSouth.add(btnCreateNewIssue);
-        pnlCenter.add(pnlSouth);
-
-        txfTodayDate.setText(todayDate());
-        txfTodayDate.setEnabled(false);
-
-        btnCreateNewIssue.setHorizontalAlignment(JButton.CENTER);
-        btnCreateNewIssue.setPreferredSize(new Dimension(25,25));
-
-        btnCreateNewIssue.addActionListener(this);
-        pnlCenter.updateUI();
     }
 
     private void myIssuesUI(){
@@ -375,12 +338,15 @@ public class AuditClient extends JFrame implements ActionListener {
         }
         else {
             signedInUser = server.login(txfUsername.getText(), pass);
-            if(rbtnUser.isSelected()) {
+            if(signedInUser.getLoginStatus() < 0){
+                JOptionPane.showMessageDialog(this, "Account is Block");
+            }
+            else if(rbtnUser.isSelected()) {
                 try{
                     user = server.getUser(signedInUser.getUserId());
                     if (user != null){
                         this.setEnabled(true);
-                        lblHeading.setText("Welcome " + txfUsername.getText());
+                        lblHeading.setText("Welcome " + user.getStaffFirstName() + " " + user.getStaffSurname());
                         pnlNorth.updateUI();
                         loginFrame.setVisible(false);
                         userUI();
@@ -395,7 +361,7 @@ public class AuditClient extends JFrame implements ActionListener {
                     auditor = server.getAuditor(signedInUser.getUserId());
                     if(auditor != null){
                         this.setEnabled(true);
-                        lblHeading.setText("Welcome " + txfUsername.getText());
+                        lblHeading.setText("Welcome " + auditor.getAuditorFirstName() + " " + auditor.getAuditorSurname());
                         pnlNorth.updateUI();
                         loginFrame.setVisible(false);
                         auditorUI();
@@ -409,4 +375,70 @@ public class AuditClient extends JFrame implements ActionListener {
         clearLoginForm();
     }
 
+    //ISSUE
+    private void createIssueUI(){
+        pnlCenter.removeAll();
+        pnlEast.removeAll();
+        pnlSouth.removeAll();
+
+        txaReport = new JTextArea();
+
+        scroll = new JScrollPane(txaReport);
+        txfTodayDate = new JTextField();
+        lblIssueDescription = new JLabel("Issue Description: ");
+        lblTodayDate = new JLabel("Raised Date: ");
+        JLabel lblIssueArea = new JLabel("Department Area: ");
+        Object areas[] = {"Administrator", "Informatics and Design", "Financial Office", "Housing", "Other"};
+        cmbIssueArea = new JComboBox(areas);
+        btnCreateNewIssue = new JButton("raise issue");
+        pnlCenter.setLayout(new GridLayout(4,1));
+        pnlSouth.setLayout(new GridLayout(1,2));
+
+        JLabel lblConfirm = new JLabel("Submit here >> ");
+
+        pnlCenter.add(lblIssueDescription);
+        pnlCenter.add(scroll);
+        pnlCenter.add(lblIssueArea);
+        pnlCenter.add(cmbIssueArea);
+        pnlCenter.add(lblTodayDate);
+        pnlCenter.add(txfTodayDate);
+
+        lblConfirm.setHorizontalAlignment(JLabel.RIGHT);
+        pnlSouth.add(lblConfirm);
+        pnlSouth.add(btnCreateNewIssue);
+        pnlCenter.add(pnlSouth);
+
+        txfTodayDate.setText(todayDate());
+        txfTodayDate.setEnabled(false);
+
+        btnCreateNewIssue.setHorizontalAlignment(JButton.CENTER);
+        btnCreateNewIssue.setPreferredSize(new Dimension(25,25));
+
+        btnCreateNewIssue.addActionListener(this);
+        pnlCenter.updateUI();
+    }
+
+    private void validateNewIssue(){
+        if(txaReport.getText().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Please Describe your Issue.");
+            txaReport.requestFocus();
+        }
+        try{
+            Issue newIssue = IssueFactory.createIssue(txaReport.getText(), cmbIssueArea.getSelectedItem().toString(), todayDate(), "NA",false,false,false);
+            Issue response = server.createIssue(newIssue);
+            Ticket newTicket = TicketFactory.buildTicket(response.getIssueId(), response.getIssueDescription(),response.getIssueRaisedDate());
+            Ticket tResponse = server.createTicket(newTicket);
+            Report newReport = ReportFactory.createReport(tResponse.getTicketId(),"NA", "NA");
+            Report rResponse = server.createReport(newReport);
+            JOptionPane.showMessageDialog(this, "Issue Recorded. Auditor will reply in due.\nThank you.");
+            txaReport.setText("");
+            cmbIssueArea.setSelectedIndex(0);
+        }
+        catch (Exception e){
+            JOptionPane.showMessageDialog(this, "Some Unknown error occurred while creating new Issue");
+        }
+    }
+
+
 }
+

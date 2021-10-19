@@ -5,18 +5,15 @@
  */
 package za.ac.cput.entity;
 
-
 public class Ticket {
     private String ticketId;
     private String ticketDescription;
     private String ticketDate;
-    private String ticketIssue;
 
     private Ticket(Builder builder) {
         this.ticketId = builder.ticketId;
         this.ticketDescription = builder.ticketDescription;
         this.ticketDate = builder.ticketDate;
-        this.ticketIssue = builder.ticketIssue;
     }
 
     public String getTicketId() {
@@ -31,28 +28,18 @@ public class Ticket {
         return ticketDate;
     }
 
-    public String getTicketIssue() {
-        return ticketIssue;
-    }
-
     @Override
     public String toString() {
         return "Builder{" +
                 "ticketId='" + ticketId + '\'' +
                 ", ticketDescription='" + ticketDescription + '\'' +
                 ", ticketDate='" + ticketDate + '\'' +
-                ", ticketIssue='" + ticketIssue + '\'' +
                 '}';
     }
 
     public static class Builder {
 
-        private String ticketId, ticketDescription, ticketDate, ticketIssue;
-
-        public Builder ticketIssue(String ticketIssue) {
-            this.ticketIssue = ticketIssue;
-            return this;
-        }
+        private String ticketId, ticketDescription, ticketDate;
 
         public Builder ticketDate(String ticketDate) {
             this.ticketDate = ticketDate;
@@ -76,7 +63,6 @@ public class Ticket {
         public Builder copy(Ticket ticket) {
             this.ticketId = ticket.ticketId;
             this.ticketDescription = ticket.ticketDescription;
-            this.ticketIssue = ticket.ticketIssue;
             this.ticketDate = ticket.ticketDate;
             return this;
         }
