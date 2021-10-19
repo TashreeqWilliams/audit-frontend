@@ -5,20 +5,26 @@ import za.ac.cput.factory.IssueFactory;
 import za.ac.cput.factory.ReportFactory;
 import za.ac.cput.factory.TicketFactory;
 import za.ac.cput.util.Client;
+import okhttp3.*;
 
 import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 
 
 public class AuditClient extends JFrame implements ActionListener {
+    public static final MediaType JSON = MediaType.get("application/json; charset=utf-8");
+    public static OkHttpClient client = new OkHttpClient();
 
-    private Client server;
     private JFrame loginFrame;
     private JPanel pnlNorth, pnlWest, pnlEast, pnlSouth, pnlCenter;
     private JTextField txfUsername, txfTodayDate;
@@ -32,19 +38,19 @@ public class AuditClient extends JFrame implements ActionListener {
     private JTable table;
     private DefaultTableModel tableModel;
     private JList navList;
-
     private UserAccount signedInUser;
-    private Auditor auditor;
+    private Client server;
     private UniversityStaff user;
+    private Auditor auditor;
 
     private AuditClient() {
         this.setPreferredSize(new Dimension(700,400));
-        server = new Client();
         pnlNorth = new JPanel();
         pnlWest = new JPanel();
         pnlEast = new JPanel();
         pnlSouth = new JPanel();
         pnlCenter = new JPanel();
+        server = new Client();
 
         txfUsername = new JTextField();
         pfPassword = new JPasswordField();
@@ -82,8 +88,9 @@ public class AuditClient extends JFrame implements ActionListener {
         this.setVisible(true);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        //userUI();
-        loginForm();
+        userUI();
+       // auditorUI();
+        //loginForm();
     }
 
     private void loginForm(){
@@ -133,7 +140,28 @@ public class AuditClient extends JFrame implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent actionEvent) {
         if(actionEvent.getSource() == btnSignIn) {
-            loginAttempt();
+            System.out.println("Signing in: " + txfUsername.getText());
+            String pass = new String(pfPassword.getPassword());
+            System.out.println("With Password: " + pass);
+            if(txfUsername.getText().isEmpty() || pass.isEmpty()) {
+            }
+            else {
+                if(rbtnUser.isSelected()) {
+                    this.setEnabled(true);
+                    lblHeading.setText("Welcome " + txfUsername.getText());
+                    pnlNorth.updateUI();
+                    loginFrame.setVisible(false);
+                    userUI();
+                }
+                else if(rbtnAuditor.isSelected()){
+                    this.setEnabled(true);
+                    lblHeading.setText("Welcome " + txfUsername.getText());
+                    pnlNorth.updateUI();
+                    loginFrame.setVisible(false);
+                    auditorUI();
+                }
+            }
+            clearLoginForm();
         }
         if(actionEvent.getSource() == btnCreateNewIssue) {
             validateNewIssue();
@@ -163,15 +191,16 @@ public class AuditClient extends JFrame implements ActionListener {
         pnlWest.removeAll();
         pnlWest.add(navList);
         userNavListSelection();
-        //pnlWest.updateUI();
+        pnlWest.updateUI();
     }
 
     private void auditorUI(){
-        String list[] = {"Dashboard", "View Open Tickets", "View Closed Tickets", "All Issues","Block User", "My Profile", "Add User", "sign out"};
+        String list[] = {"Dashboard", "View Open Tickets", "View Closed Tickets", "All Issues","Block User", "User Profile", "Add User", "sign out"};
         navList = new JList(list);
         pnlWest.removeAll();
         pnlWest.add(navList);
         auditorNavListSelection();
+        pnlWest.updateUI();
     }
 
     private void userNavListSelection(){
@@ -213,16 +242,16 @@ public class AuditClient extends JFrame implements ActionListener {
                         System.out.println("View Closed Tickets under construction!");
                         break;
                     case 3:
-                        System.out.println("All Issues under construction!");
-                        break;
-                    case 4:
                         System.out.println("Block User under construction!");
                         break;
-                    case 5:
+                    case 4:
                         System.out.println("My Profile under construction!");
                         break;
-                    case 6:
+                    case 5:
                         System.out.println("Add User under construction!");
+                        break;
+                    case 6:
+                        addUser();
                         break;
                     case 7:
                         signOut();
@@ -231,6 +260,67 @@ public class AuditClient extends JFrame implements ActionListener {
                 }
             }
         });
+    }
+    private void addUser(){
+        pnlCenter.removeAll();
+        pnlEast.removeAll();
+        pnlSouth.removeAll();
+
+        pnlCenter.setLayout(new GridLayout(2,1));
+        JPanel pnlTop = new JPanel();
+        JPanel pnlRadio = new JPanel();
+        JPanel pnlBottom = new JPanel();
+
+        pnlTop.setLayout(new GridLayout(8,2));
+        pnlRadio.setLayout(new GridLayout(1,2));
+        pnlBottom.setLayout(new GridLayout(1,1));
+
+        ButtonGroup loginType = new ButtonGroup();
+        loginType.add(rbtnAuditor);
+        loginType.add(rbtnUser);
+
+        JLabel lblFirstName = new JLabel("First Name");
+        JLabel lblLastName = new JLabel("Last Name");
+        JLabel lblUsername = new JLabel("Username");
+        JLabel lblPassword = new JLabel("Password");
+        JLabel lblLoginType = new JLabel("Account: ");
+        JLabel lblEmail = new JLabel("Email Address");
+        JLabel lblPhone = new JLabel("Phone number");
+        JTextField txtFirstName = new JTextField();
+        JTextField txtLastName = new JTextField();
+        JTextField txtUsername = new JTextField();
+        JTextField txtEmail = new JTextField();
+        JTextField txtPhone = new JTextField();
+        JPasswordField txtPassword = new JPasswordField();
+        JButton submitButton =new JButton("Add user");
+
+        // left.add(addUserHeading);
+        pnlTop.add(lblFirstName);
+        pnlTop.add(txtFirstName);
+        pnlTop.add(lblLastName);
+        pnlTop.add(txtLastName);
+        pnlTop.add(lblUsername);
+        pnlTop.add(txtUsername);
+        pnlTop.add(lblPassword);
+        pnlTop.add(txtPassword);
+        pnlTop.add(lblEmail);
+        pnlTop.add(txtEmail);
+        pnlTop.add(lblPhone);
+        pnlTop.add(txtPhone);
+        pnlRadio.add(rbtnAuditor);
+        pnlRadio.add(rbtnUser);
+        pnlTop.add(lblLoginType);
+        pnlTop.add(pnlRadio);
+        pnlTop.add(submitButton);
+
+        txtUsername.requestFocus();
+
+        pnlCenter.add(pnlTop, BorderLayout.NORTH);
+
+        pnlCenter.add(pnlBottom, BorderLayout.SOUTH);
+
+        pnlCenter.updateUI();
+        pnlEast.updateUI();
     }
 
     private String todayDate(){
@@ -438,7 +528,6 @@ public class AuditClient extends JFrame implements ActionListener {
             JOptionPane.showMessageDialog(this, "Some Unknown error occurred while creating new Issue");
         }
     }
-
 
 }
 
