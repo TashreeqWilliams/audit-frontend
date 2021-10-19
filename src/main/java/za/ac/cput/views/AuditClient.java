@@ -14,7 +14,6 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.HashMap;
 
 
 public class AuditClient extends JFrame implements ActionListener {
@@ -34,13 +33,6 @@ public class AuditClient extends JFrame implements ActionListener {
     private JTable table;
     private DefaultTableModel tableModel;
     private JList navList;
-
-    private JPanel panelMain;
-    private JPasswordField passwordField;
-    private JPanel bottomPanel;
-    private ButtonGroup group1;
-    private JButton btnSubmit;
-
 
     private AuditClient() {
         this.setPreferredSize(new Dimension(700,400));
@@ -195,6 +187,64 @@ public class AuditClient extends JFrame implements ActionListener {
         auditorNavListSelection();
     }
 
+    private void userNavListSelection(){
+        navList.addListSelectionListener(e -> {
+            if(!e.getValueIsAdjusting()){
+                switch(navList.getSelectedIndex()){
+                    case 0:
+                        System.out.println("Dashboard under construction!");
+                        break;
+                    case 1:
+                        createIssueUI();
+                        break;
+                    case 2:
+                        myIssuesUI();
+                        break;
+                    case 3:
+                        System.out.println("User Profile under construction!");
+                        break;
+                    case 4:
+                        signOut();
+                        break;
+                    default: JOptionPane.showMessageDialog(this, "Invalid Selection made.");
+                }
+            }
+        });
+    }
+
+    private void auditorNavListSelection(){
+        navList.addListSelectionListener(e -> {
+            if(!e.getValueIsAdjusting()){
+                switch(navList.getSelectedIndex()){
+                    case 0:
+                        System.out.println("Dashboard under construction!");
+                        break;
+                    case 1:
+                        viewOpenTickets();
+                        break;
+                    case 2:
+                        System.out.println("View Closed Tickets under construction!");
+                        break;
+                    case 3:
+                        System.out.println("Block User under construction!");
+                        break;
+                    case 4:
+                        System.out.println("My Profile under construction!");
+                        break;
+                    case 5:
+                        System.out.println("Add User under construction!");
+                        break;
+                    case 6:
+                        addUser();
+                        break;
+                    case 7:
+                        signOut();
+                        break;
+                    default: JOptionPane.showMessageDialog(this, "Invalid Selection made.");
+                }
+            }
+        });
+    }
     private void addUser(){
         pnlCenter.removeAll();
         pnlEast.removeAll();
@@ -235,7 +285,7 @@ public class AuditClient extends JFrame implements ActionListener {
 
 
 
-       // left.add(addUserHeading);
+        // left.add(addUserHeading);
         pnlTop.add(lblFirstName);
         pnlTop.add(txtFirstName);
         pnlTop.add(lblLastName);
@@ -265,66 +315,6 @@ public class AuditClient extends JFrame implements ActionListener {
         pnlCenter.updateUI();
         pnlEast.updateUI();
 
-
-    }
-
-    private void userNavListSelection(){
-        navList.addListSelectionListener(e -> {
-            if(!e.getValueIsAdjusting()){
-                switch(navList.getSelectedIndex()){
-                    case 0:
-                        System.out.println("Dashboard under construction!");
-                        break;
-                    case 1:
-                        createIssueUI();
-                        break;
-                    case 2:
-                        myIssuesUI();
-                        break;
-                    case 3:
-                        System.out.println("User Profile under construction!");
-                        break;
-                    case 4:
-                        signOut();
-                        break;
-                    default: JOptionPane.showMessageDialog(this, "Invalid Selection made.");
-                }
-            }
-        });
-    }
-
-    private void auditorNavListSelection(){
-        navList.addListSelectionListener(e -> {
-            if(!e.getValueIsAdjusting()){
-                switch(navList.getSelectedIndex()){
-                    case 0:
-                        System.out.println("Dashboard under construction!");
-                        break;
-                    case 1:
-                        viewOpenTickets();
-                        break;
-                    case 2:
-                        System.out.println("View Closed Tickets under construction!");
-                        break;
-                    case 3:
-                        System.out.println("All issues under construction");
-                        break;
-                    case 4:
-                        System.out.println("Block User under construction!");
-                        break;
-                    case 5:
-                        System.out.println("My Profile under construction!");
-                        break;
-                    case 6:
-                        addUser();
-                        break;
-                    case 7:
-                        signOut();
-                        break;
-                    default: JOptionPane.showMessageDialog(this, "Invalid Selection made.");
-                }
-            }
-        });
     }
 
     private String todayDate(){
@@ -427,7 +417,6 @@ public class AuditClient extends JFrame implements ActionListener {
         pnlCenter.setLayout(new GridLayout(1,2));
         JPanel left = new JPanel(new GridLayout(2,1));
         JPanel right = new JPanel(new GridLayout(2,1));
-
 
         table = new JTable();
         JLabel lblTicketHeading = new JLabel("Tickets");
