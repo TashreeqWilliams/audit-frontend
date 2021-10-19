@@ -1,25 +1,23 @@
 package za.ac.cput.views;
 
-import okhttp3.*;
+import za.ac.cput.entity.Auditor;
+import za.ac.cput.entity.UniversityStaff;
+import za.ac.cput.entity.UserAccount;
+import za.ac.cput.util.Client;
 
 import javax.swing.*;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 
 
 public class AuditClient extends JFrame implements ActionListener {
-    public static final MediaType JSON = MediaType.get("application/json; charset=utf-8");
-    public static OkHttpClient client = new OkHttpClient();
 
+    private Client server;
     private JFrame loginFrame;
     private JPanel pnlNorth, pnlWest, pnlEast, pnlSouth, pnlCenter;
     private JTextField txfUsername, txfTodayDate;
@@ -34,8 +32,13 @@ public class AuditClient extends JFrame implements ActionListener {
     private DefaultTableModel tableModel;
     private JList navList;
 
+    private UserAccount signedInUser;
+    private Auditor auditor;
+    private UniversityStaff user;
+
     private AuditClient() {
         this.setPreferredSize(new Dimension(700,400));
+        server = new Client();
         pnlNorth = new JPanel();
         pnlWest = new JPanel();
         pnlEast = new JPanel();
@@ -129,28 +132,7 @@ public class AuditClient extends JFrame implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent actionEvent) {
         if(actionEvent.getSource() == btnSignIn) {
-            System.out.println("Signing in: " + txfUsername.getText());
-            String pass = new String(pfPassword.getPassword());
-            System.out.println("With Password: " + pass);
-            if(txfUsername.getText().isEmpty() || pass.isEmpty()) {
-            }
-            else {
-                if(rbtnUser.isSelected()) {
-                    this.setEnabled(true);
-                    lblHeading.setText("Welcome " + txfUsername.getText());
-                    pnlNorth.updateUI();
-                    loginFrame.setVisible(false);
-                    userUI();
-                }
-                else if(rbtnAuditor.isSelected()){
-                    this.setEnabled(true);
-                    lblHeading.setText("Welcome " + txfUsername.getText());
-                    pnlNorth.updateUI();
-                    loginFrame.setVisible(false);
-                    auditorUI();
-                }
-            }
-            clearLoginForm();
+            loginAttempt();
         }
     }
 
@@ -180,7 +162,7 @@ public class AuditClient extends JFrame implements ActionListener {
     }
 
     private void auditorUI(){
-        String list[] = {"Dashboard", "View Open Tickets", "View Closed Tickets", "All Issues","Block User", "User Profile", "Add User", "sign out"};
+        String list[] = {"Dashboard", "View Open Tickets", "View Closed Tickets", "All Issues","Block User", "My Profile", "Add User", "sign out"};
         navList = new JList(list);
         pnlWest.removeAll();
         pnlWest.add(navList);
@@ -226,15 +208,18 @@ public class AuditClient extends JFrame implements ActionListener {
                         System.out.println("View Closed Tickets under construction!");
                         break;
                     case 3:
-                        System.out.println("Block User under construction!");
+                        System.out.println("All Issues under construction!");
                         break;
                     case 4:
-                        System.out.println("My Profile under construction!");
+                        System.out.println("Block User under construction!");
                         break;
                     case 5:
-                        System.out.println("Add User under construction!");
+                        System.out.println("My Profile under construction!");
                         break;
                     case 6:
+                        System.out.println("Add User under construction!");
+                        break;
+                    case 7:
                         signOut();
                         break;
                     default: JOptionPane.showMessageDialog(this, "Invalid Selection made.");
@@ -380,6 +365,48 @@ public class AuditClient extends JFrame implements ActionListener {
 
         pnlCenter.updateUI();
         pnlEast.updateUI();
+    }
+
+    private void loginAttempt(){
+        //System.out.println("Signing in: " + txfUsername.getText());
+        String pass = new String(pfPassword.getPassword());
+        //System.out.println("With Password: " + pass);
+        if(txfUsername.getText().isEmpty() || pass.isEmpty()) {
+        }
+        else {
+            signedInUser = server.login(txfUsername.getText(), pass);
+            if(rbtnUser.isSelected()) {
+                try{
+                    user = server.getUser(signedInUser.getUserId());
+                    if (user != null){
+                        this.setEnabled(true);
+                        lblHeading.setText("Welcome " + txfUsername.getText());
+                        pnlNorth.updateUI();
+                        loginFrame.setVisible(false);
+                        userUI();
+                    }
+                }
+                catch (Exception e){
+                    clearLoginForm();
+                }
+            }
+            else if(rbtnAuditor.isSelected()){
+                try{
+                    auditor = server.getAuditor(signedInUser.getUserId());
+                    if(auditor != null){
+                        this.setEnabled(true);
+                        lblHeading.setText("Welcome " + txfUsername.getText());
+                        pnlNorth.updateUI();
+                        loginFrame.setVisible(false);
+                        auditorUI();
+                    }
+                }
+                catch (Exception e){
+                    clearLoginForm();
+                }
+            }
+        }
+        clearLoginForm();
     }
 
 }
