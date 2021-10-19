@@ -89,7 +89,7 @@ public class AuditClient extends JFrame implements ActionListener {
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         userUI();
-       // auditorUI();
+        auditorUI();
         //loginForm();
     }
 
@@ -189,6 +189,9 @@ public class AuditClient extends JFrame implements ActionListener {
         String list[] = {"Dashboard", "Raise Issue", "My Issues", "User Profile", "sign out"};
         navList = new JList(list);
         pnlWest.removeAll();
+        pnlCenter.removeAll();
+        pnlEast.removeAll();
+        pnlSouth.removeAll();
         pnlWest.add(navList);
         userNavListSelection();
         pnlWest.updateUI();
@@ -198,6 +201,9 @@ public class AuditClient extends JFrame implements ActionListener {
         String list[] = {"Dashboard", "View Open Tickets", "View Closed Tickets", "All Issues","Block User", "User Profile", "Add User", "sign out"};
         navList = new JList(list);
         pnlWest.removeAll();
+        pnlCenter.removeAll();
+        pnlEast.removeAll();
+        pnlSouth.removeAll();
         pnlWest.add(navList);
         auditorNavListSelection();
         pnlWest.updateUI();
@@ -220,7 +226,8 @@ public class AuditClient extends JFrame implements ActionListener {
                         System.out.println("User Profile under construction!");
                         break;
                     case 4:
-                        signOut();
+                        //signOut();
+                        auditorUI();
                         break;
                     default: JOptionPane.showMessageDialog(this, "Invalid Selection made.");
                 }
@@ -256,7 +263,8 @@ public class AuditClient extends JFrame implements ActionListener {
                         addUser();
                         break;
                     case 7:
-                        signOut();
+                        //signOut();
+                        userUI();
                         break;
                     default: JOptionPane.showMessageDialog(this, "Invalid Selection made.");
                 }
@@ -471,49 +479,47 @@ public class AuditClient extends JFrame implements ActionListener {
     }
 
     //ISSUE
-    private void createIssueUI() { }
+    private void createIssueUI(){
+        pnlCenter.removeAll();
+        pnlEast.removeAll();
+        pnlSouth.removeAll();
 
-    private void viewOpenAllIssues () {
-            pnlCenter.removeAll();
-            pnlEast.removeAll();
-            pnlSouth.removeAll();
+        txaReport = new JTextArea();
 
-            txaReport = new JTextArea();
+        scroll = new JScrollPane(txaReport);
+        txfTodayDate = new JTextField();
+        lblIssueDescription = new JLabel("Issue Description: ");
+        lblTodayDate = new JLabel("Raised Date: ");
+        JLabel lblIssueArea = new JLabel("Department Area: ");
+        Object areas[] = {"Administrator", "Informatics and Design", "Financial Office", "Housing", "Other"};
+        cmbIssueArea = new JComboBox(areas);
+        btnCreateNewIssue = new JButton("raise issue");
+        pnlCenter.setLayout(new GridLayout(4,1));
+        pnlSouth.setLayout(new GridLayout(1,2));
 
-            scroll = new JScrollPane(txaReport);
-            txfTodayDate = new JTextField();
-            lblIssueDescription = new JLabel("Issue Description: ");
-            lblTodayDate = new JLabel("Raised Date: ");
-            JLabel lblIssueArea = new JLabel("Department Area: ");
-            Object areas[] = {"Administrator", "Informatics and Design", "Financial Office", "Housing", "Other"};
-            cmbIssueArea = new JComboBox(areas);
-            btnCreateNewIssue = new JButton("raise issue");
-            pnlCenter.setLayout(new GridLayout(4, 1));
-            pnlSouth.setLayout(new GridLayout(1, 2));
+        JLabel lblConfirm = new JLabel("Submit here >> ");
 
-            JLabel lblConfirm = new JLabel("Submit here >> ");
+        pnlCenter.add(lblIssueDescription);
+        pnlCenter.add(scroll);
+        pnlCenter.add(lblIssueArea);
+        pnlCenter.add(cmbIssueArea);
+        pnlCenter.add(lblTodayDate);
+        pnlCenter.add(txfTodayDate);
 
-            pnlCenter.add(lblIssueDescription);
-            pnlCenter.add(scroll);
-            pnlCenter.add(lblIssueArea);
-            pnlCenter.add(cmbIssueArea);
-            pnlCenter.add(lblTodayDate);
-            pnlCenter.add(txfTodayDate);
+        lblConfirm.setHorizontalAlignment(JLabel.RIGHT);
+        pnlSouth.add(lblConfirm);
+        pnlSouth.add(btnCreateNewIssue);
+        pnlCenter.add(pnlSouth);
 
-            lblConfirm.setHorizontalAlignment(JLabel.RIGHT);
-            pnlSouth.add(lblConfirm);
-            pnlSouth.add(btnCreateNewIssue);
-            pnlCenter.add(pnlSouth);
+        txfTodayDate.setText(todayDate());
+        txfTodayDate.setEnabled(false);
 
-            txfTodayDate.setText(todayDate());
-            txfTodayDate.setEnabled(false);
+        btnCreateNewIssue.setHorizontalAlignment(JButton.CENTER);
+        btnCreateNewIssue.setPreferredSize(new Dimension(25,25));
 
-            btnCreateNewIssue.setHorizontalAlignment(JButton.CENTER);
-            btnCreateNewIssue.setPreferredSize(new Dimension(25, 25));
-
-            btnCreateNewIssue.addActionListener(this);
-            pnlCenter.updateUI();
-        }
+        btnCreateNewIssue.addActionListener(this);
+        pnlCenter.updateUI();
+    }
 
     private void validateNewIssue() {
         if (txaReport.getText().isEmpty()) {
@@ -535,13 +541,16 @@ public class AuditClient extends JFrame implements ActionListener {
         }
     }
 
-    private void xxx () {
+    private void viewOpenAllIssues () {
+        pnlSouth.removeAll();
+        pnlCenter.removeAll();
         pnlCenter.setLayout(new GridLayout(3, 1));
 
         JLabel AllIssues = new JLabel("All Issues");
         AllIssues.setHorizontalAlignment(JLabel.CENTER);
 
         Object[] columns = {"Issue ID", "issueArea", "Description", "Raised", "Resolved", "Status", "Validated"};
+        table = new JTable();
         tableModel = new DefaultTableModel();
         tableModel.setColumnIdentifiers(columns);
         table.setModel(tableModel);
