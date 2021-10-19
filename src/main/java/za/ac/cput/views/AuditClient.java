@@ -14,6 +14,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 
 
 public class AuditClient extends JFrame implements ActionListener {
@@ -33,6 +34,13 @@ public class AuditClient extends JFrame implements ActionListener {
     private JTable table;
     private DefaultTableModel tableModel;
     private JList navList;
+
+    private JPanel panelMain;
+    private JPasswordField passwordField;
+    private JPanel bottomPanel;
+    private ButtonGroup group1;
+    private JButton btnSubmit;
+
 
     private AuditClient() {
         this.setPreferredSize(new Dimension(700,400));
@@ -187,6 +195,79 @@ public class AuditClient extends JFrame implements ActionListener {
         auditorNavListSelection();
     }
 
+    private void addUser(){
+        pnlCenter.removeAll();
+        pnlEast.removeAll();
+        pnlSouth.removeAll();
+
+
+        pnlCenter.setLayout(new GridLayout(2,1));
+        JPanel pnlTop = new JPanel();
+        JPanel pnlRadio = new JPanel();
+        JPanel pnlBottom = new JPanel();
+
+
+        pnlTop.setLayout(new GridLayout(8,2));
+        pnlRadio.setLayout(new GridLayout(1,2));
+        pnlBottom.setLayout(new GridLayout(1,1));
+
+
+        ButtonGroup loginType = new ButtonGroup();
+        loginType.add(rbtnAuditor);
+        loginType.add(rbtnUser);
+
+
+        JLabel lblFirstName = new JLabel("First Name");
+        JLabel lblLastName = new JLabel("Last Name");
+        JLabel lblUsername = new JLabel("Username");
+        JLabel lblPassword = new JLabel("Password");
+        JLabel lblLoginType = new JLabel("Account: ");
+        JLabel lblEmail = new JLabel("Email Address");
+        JLabel lblPhone = new JLabel("Phone number");
+        JTextField txtFirstName = new JTextField();
+        JTextField txtLastName = new JTextField();
+        JTextField txtUsername = new JTextField();
+        JTextField txtEmail = new JTextField();
+        JTextField txtPhone = new JTextField();
+        JPasswordField txtPassword = new JPasswordField();
+        JButton submitButton =new JButton("Add user");
+
+
+
+
+       // left.add(addUserHeading);
+        pnlTop.add(lblFirstName);
+        pnlTop.add(txtFirstName);
+        pnlTop.add(lblLastName);
+        pnlTop.add(txtLastName);
+        pnlTop.add(lblUsername);
+        pnlTop.add(txtUsername);
+        pnlTop.add(lblPassword);
+        pnlTop.add(txtPassword);
+        pnlTop.add(lblEmail);
+        pnlTop.add(txtEmail);
+        pnlTop.add(lblPhone);
+        pnlTop.add(txtPhone);
+        pnlRadio.add(rbtnAuditor);
+        pnlRadio.add(rbtnUser);
+        pnlTop.add(lblLoginType);
+        pnlTop.add(pnlRadio);
+        pnlTop.add(submitButton);
+
+        txtUsername.requestFocus();
+
+
+        pnlCenter.add(pnlTop, BorderLayout.NORTH);
+
+        pnlCenter.add(pnlBottom, BorderLayout.SOUTH);
+
+
+        pnlCenter.updateUI();
+        pnlEast.updateUI();
+
+
+    }
+
     private void userNavListSelection(){
         navList.addListSelectionListener(e -> {
             if(!e.getValueIsAdjusting()){
@@ -226,15 +307,18 @@ public class AuditClient extends JFrame implements ActionListener {
                         System.out.println("View Closed Tickets under construction!");
                         break;
                     case 3:
-                        System.out.println("Block User under construction!");
+                        System.out.println("All issues under construction");
                         break;
                     case 4:
-                        System.out.println("My Profile under construction!");
+                        System.out.println("Block User under construction!");
                         break;
                     case 5:
-                        System.out.println("Add User under construction!");
+                        System.out.println("My Profile under construction!");
                         break;
                     case 6:
+                        addUser();
+                        break;
+                    case 7:
                         signOut();
                         break;
                     default: JOptionPane.showMessageDialog(this, "Invalid Selection made.");
@@ -343,6 +427,7 @@ public class AuditClient extends JFrame implements ActionListener {
         pnlCenter.setLayout(new GridLayout(1,2));
         JPanel left = new JPanel(new GridLayout(2,1));
         JPanel right = new JPanel(new GridLayout(2,1));
+
 
         table = new JTable();
         JLabel lblTicketHeading = new JLabel("Tickets");
