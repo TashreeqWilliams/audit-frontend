@@ -82,8 +82,8 @@ public class AuditClient extends JFrame implements ActionListener {
         this.setVisible(true);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        userUI();
-        //loginForm();
+        //userUI();
+        loginForm();
     }
 
     private void loginForm(){
@@ -163,7 +163,7 @@ public class AuditClient extends JFrame implements ActionListener {
         pnlWest.removeAll();
         pnlWest.add(navList);
         userNavListSelection();
-        pnlWest.updateUI();
+        //pnlWest.updateUI();
     }
 
     private void auditorUI(){
