@@ -214,7 +214,9 @@ public class AuditClient extends JFrame implements ActionListener {
 
     private void auditorNavListSelection(){
         navList.addListSelectionListener(e -> {
-            if(!e.getValueIsAdjusting()){
+            if(!e.getValueIsAdjusting())
+            try
+            {
                 switch(navList.getSelectedIndex()){
                     case 0:
                         System.out.println("Dashboard under construction!");
@@ -226,7 +228,7 @@ public class AuditClient extends JFrame implements ActionListener {
                         System.out.println("View Closed Tickets under construction!");
                         break;
                     case 3:
-                        System.out.println("Block User under construction!");
+                        viewOpenAllIssues();
                         break;
                     case 4:
                         System.out.println("My Profile under construction!");
@@ -242,6 +244,8 @@ public class AuditClient extends JFrame implements ActionListener {
                         break;
                     default: JOptionPane.showMessageDialog(this, "Invalid Selection made.");
                 }
+            }catch (Exception exception) {
+                System.out.println("Null pointer exception");
             }
         });
     }
@@ -455,5 +459,36 @@ public class AuditClient extends JFrame implements ActionListener {
         pnlCenter.updateUI();
         pnlEast.updateUI();
     }
+
+    private void viewOpenAllIssues() {
+        pnlCenter.removeAll();
+        pnlEast.removeAll();
+        pnlSouth.removeAll();
+
+        pnlCenter.setLayout(new GridLayout(3, 1));
+
+        JLabel AllIssues = new JLabel("All Issues");
+        AllIssues.setHorizontalAlignment(JLabel.CENTER);
+
+        Object[] columns = {"Issue ID","issueArea", "Description", "Raised", "Resolved", "Status", "Validated"};
+        tableModel = new DefaultTableModel();
+        tableModel.setColumnIdentifiers(columns);
+        table.setModel(tableModel);
+        table.setBackground(new Color(123, 123, 123));
+        table.setForeground(Color.BLACK);
+        table.setFont(new Font("Arial", Font.BOLD, 16));
+        table.setRowHeight(40);
+        table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        table.setDefaultEditor(Object.class, null);
+        scroll = new JScrollPane(table);
+
+        pnlCenter.add(AllIssues);
+        pnlCenter.add(scroll);
+
+        pnlCenter.updateUI();
+        pnlEast.updateUI();
+
+    }
+
 
 }
