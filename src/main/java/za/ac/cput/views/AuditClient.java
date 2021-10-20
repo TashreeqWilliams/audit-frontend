@@ -50,12 +50,20 @@ public class AuditClient extends JFrame implements ActionListener {
 
         lblHeading = new JLabel("sign in required");
         lblUsername = new JLabel("Username: ");
+        lblUsername.setFont(new Font("Serif", Font.BOLD,15));
         lblPassword = new JLabel("Password: ");
+        lblPassword.setFont(new Font("Serif", Font.BOLD,15));
 
-        rbtnAuditor = new JRadioButton("auditor");
-        rbtnUser = new JRadioButton("user");
+        rbtnAuditor = new JRadioButton("Auditor");
+        rbtnAuditor.setFont(new Font("Serif", Font.ITALIC,15));
 
-        btnSignIn = new JButton("sign in");
+        rbtnUser = new JRadioButton("User");
+        rbtnUser.setFont(new Font("Serif", Font.ITALIC,15));
+
+
+        ImageIcon signInIcon = new ImageIcon("C:\\audit-frontend2\\src\\main\\java\\za\\ac\\cput\\views\\Icons\\3994380_access_enter_input_login_sign in_icon (3).png");
+        btnSignIn = new JButton("SIGN IN", signInIcon);
+        btnSignIn.setFont(new Font("Serif", Font.BOLD,15));
     }
 
     private void setUp(){
@@ -88,11 +96,15 @@ public class AuditClient extends JFrame implements ActionListener {
     private void loginForm(){
         this.setEnabled(false);
         loginFrame = new JFrame("Sign in");
-        loginFrame.setPreferredSize(new Dimension(350,150));
+        loginFrame.getContentPane().setBackground(Color.GRAY);
+        loginFrame.setPreferredSize(new Dimension(350,205));
         JPanel pnlTop = new JPanel();
         JPanel pnlRadio = new JPanel();
         JPanel pnlBottom = new JPanel();
         JLabel lblLoginType = new JLabel("Account: ");
+        lblLoginType.setFont(new Font("Serif", Font.BOLD,15));
+
+
 
         pnlTop.setLayout(new GridLayout(3,2));
         pnlRadio.setLayout(new GridLayout(1,2));
