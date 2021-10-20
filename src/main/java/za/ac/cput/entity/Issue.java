@@ -12,7 +12,7 @@ public class Issue implements Serializable {
 
     private String issueId;
     private String issueDescription, issueArea, issueRaisedDate, issueResolvedDate;
-    private boolean issueStatus, isResolved, isValidated;
+    private int issueStatus, isResolved, isValidated;
 
     private Issue(){}
 
@@ -47,15 +47,15 @@ public class Issue implements Serializable {
         return issueResolvedDate;
     }
 
-    public boolean isIssueStatus() {
+    public int getIssueStatus() {
         return issueStatus;
     }
 
-    public boolean isResolved() {
+    public int getIsResolved() {
         return isResolved;
     }
 
-    public boolean isValidated() {
+    public int getIsValidated() {
         return isValidated;
     }
 
@@ -75,7 +75,7 @@ public class Issue implements Serializable {
 
     public static class Builder {
         private String issueId, issueDescription, issueArea, issueRaisedDate, issueResolvedDate;
-        private boolean issueStatus, isResolved, isValidated;
+        private int issueStatus, isResolved, isValidated;
 
         public Builder issueId(String issueId){
             this.issueId = issueId;
@@ -102,17 +102,17 @@ public class Issue implements Serializable {
             return this;
         }
 
-        public Builder issueStatus(boolean issueStatus){
+        public Builder issueStatus(int issueStatus){
             this.issueStatus = issueStatus;
             return this;
         }
 
-        public Builder isResolved(boolean isResolved){
+        public Builder isResolved(int isResolved){
             this.isResolved = isResolved;
             return this;
         }
 
-        public Builder isValidated(boolean isValidated){
+        public Builder isValidated(int isValidated){
             this.isValidated = isValidated;
             return this;
         }

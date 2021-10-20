@@ -10,12 +10,13 @@ import za.ac.cput.entity.Report;
 
 public class ReportFactory {
 
-    public static Report createReport(String reportId, String reportAuth, String reportDate){
+    public static Report createReport(String reportId, String reportAuth, String report, String reportDate){
 
         return new Report.Builder().
                 setReportId(reportId).
                 setReportAuth(reportAuth).
                 setReportDate(reportDate).
+                setReport(report).
                 build();
     }
 }
