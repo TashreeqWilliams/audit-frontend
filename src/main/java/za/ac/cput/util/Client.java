@@ -1,12 +1,13 @@
 package za.ac.cput.util;
 
+
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonParser;
 import okhttp3.*;
 import za.ac.cput.entity.*;
 
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 
 public class Client {
@@ -35,7 +36,16 @@ public class Client {
         }
     }
 
-    //UPDATE
+    //DELETE
+    private String delete(final String URL) throws IOException{
+        Request request = new Request.Builder()
+                .url(URL)
+                .build();
+        try(Response response = client.newCall(request).execute()){
+            return response.body().string();
+        }
+    }
+
     private String put(final String URL, String json) throws IOException{
         RequestBody body = RequestBody.create(JSON, json);
         Request request = new Request.Builder()
@@ -47,19 +57,18 @@ public class Client {
         }
     }
 
-    public UserAccount login(String email, String password){
+    public UserAccount login(String id, String email, String password){
         try{
-            final String URl = "http://localhost:8080/useraccount/login/" + email + "/" + password;
+
+            //final String URl = "http://localhost:8080/useraccount/login/" + email + "/" + password;
+            final String URl = "http://localhost:8080/useraccount/read/" + id;
             String responseBody = run(URl);
 
             Gson g = new Gson();
-            JsonArray userAccounts = (JsonArray) JsonParser.parseString(responseBody);
-            if(userAccounts.size() == 1){
-                UserAccount userAccount = g.fromJson(userAccounts.get(0), UserAccount.class);
-                return userAccount;
-            }
-            return null;
+            UserAccount userAccount = g.fromJson(responseBody.toString(), UserAccount.class);
+            return userAccount;
         } catch (Exception e) {
+            e.printStackTrace();
             return null;
         }
     }
@@ -70,12 +79,8 @@ public class Client {
             String responseBody = run(URl);
 
             Gson g = new Gson();
-            JsonArray auditors = (JsonArray) JsonParser.parseString(responseBody);
-            if(auditors.size() == 1){
-                Auditor auditor = g.fromJson(auditors.get(0), Auditor.class);
-                return auditor;
-            }
-            return null;
+            Auditor auditor = g.fromJson(responseBody.toString(), Auditor.class);
+            return auditor;
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -114,18 +119,60 @@ public class Client {
         return null;
     }
 
+    public UserAccount createUserAccount(UserAccount userAccount){
+        try{
+            final String URl = "http://localhost:8080/useraccount/create";
+
+            Gson g = new Gson();
+            String jsonString = g.toJson(userAccount);
+            String x = post(URl, jsonString);
+            if(x != null)
+                return userAccount;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+        return null;
+    }
+
+    public UserAccount updateUserAccount(UserAccount userAccount){
+        try{
+            final String URl = "http://localhost:8080/useraccount/update";
+
+            Gson g = new Gson();
+            String jsonString = g.toJson(userAccount);
+            String x = put(URl, jsonString);
+            if(x != null)
+                return userAccount;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+        return null;
+    }
+
     public UniversityStaff getUser(String id){
         try{
             final String URl = "http://localhost:8080/universitystaff/read/" + id;
             String responseBody = run(URl);
 
             Gson g = new Gson();
-            JsonArray users = (JsonArray) JsonParser.parseString(responseBody);
-            if(users.size() == 1){
-                UniversityStaff user = g.fromJson(users.get(0), UniversityStaff.class);
-                return user;
-            }
+            UniversityStaff universityStaff = g.fromJson(responseBody.toString(), UniversityStaff.class);
+            return universityStaff;
+        } catch (Exception e) {
+            e.printStackTrace();
             return null;
+        }
+    }
+
+    public UniversityStaff deleteUser(String id){
+        try{
+            final String URl = "http://localhost:8080/universitystaff/delete/" + id;
+            String responseBody = delete(URl);
+
+            Gson g = new Gson();
+            UniversityStaff universityStaff = g.fromJson(responseBody.toString(), UniversityStaff.class);
+            return universityStaff;
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -150,7 +197,7 @@ public class Client {
 
     public UniversityStaff createUser(UniversityStaff universityStaff){
         try{
-            final String URl = "http://localhost:8080/universityStaff/create";
+            final String URl = "http://localhost:8080/universitystaff/create";
 
             Gson g = new Gson();
             String jsonString = g.toJson(universityStaff);
@@ -170,12 +217,8 @@ public class Client {
             String responseBody = run(URl);
 
             Gson g = new Gson();
-            JsonArray issues = (JsonArray) JsonParser.parseString(responseBody);
-            if(issues.size() == 1){
-                Issue issue = g.fromJson(issues.get(0), Issue.class);
-                return issue;
-            }
-            return null;
+            Issue issue = g.fromJson(responseBody.toString(), Issue.class);
+            return issue;
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -220,12 +263,8 @@ public class Client {
             String responseBody = run(URl);
 
             Gson g = new Gson();
-            JsonArray reports = (JsonArray) JsonParser.parseString(responseBody);
-            if(reports.size() == 1){
-                Report user = g.fromJson(reports.get(0), Report.class);
-                return user;
-            }
-            return null;
+            Report report = g.fromJson(responseBody.toString(), Report.class);
+            return report;
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -264,18 +303,30 @@ public class Client {
         return null;
     }
 
+    public UserIssue createUserIssue(UserIssue userIssue){
+        try{
+            final String URl = "http://localhost:8080/userissue/create";
+
+            Gson g = new Gson();
+            String jsonString = g.toJson(userIssue);
+            String x = post(URl, jsonString);
+            if(x != null)
+                return userIssue;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+        return null;
+    }
+
     public Ticket getTicket(String id){
         try{
             final String URl = "http://localhost:8080/ticket/read/" + id;
             String responseBody = run(URl);
 
             Gson g = new Gson();
-            JsonArray issues = (JsonArray) JsonParser.parseString(responseBody);
-            if(issues.size() == 1){
-                Ticket ticket = g.fromJson(issues.get(0), Ticket.class);
-                return ticket;
-            }
-            return null;
+            Ticket ticket = g.fromJson(responseBody.toString(), Ticket.class);
+            return ticket;
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -330,6 +381,38 @@ public class Client {
         }
     }
 
+    public ArrayList<Issue> getAllOpenIssues(){
+        try{
+            final String URl = "http://localhost:8080/issue/getallopen";
+            String responseBody = run(URl);
+            ArrayList<Issue> allOpenIssues = new ArrayList<>();
+            Gson g = new Gson();
+            JsonArray issues = (JsonArray) JsonParser.parseString(responseBody);
+            for(int i = 0; i < issues.size(); i++)
+                allOpenIssues.add(g.fromJson(issues.get(i), Issue.class));
+            return allOpenIssues;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public ArrayList<Issue> getAllClosedIssues(){
+        try{
+            final String URl = "http://localhost:8080/issue/getallclosed";
+            String responseBody = run(URl);
+            ArrayList<Issue> allClosedIssues = new ArrayList<>();
+            Gson g = new Gson();
+            JsonArray issues = (JsonArray) JsonParser.parseString(responseBody);
+            for(int i = 0; i < issues.size(); i++)
+                allClosedIssues.add(g.fromJson(issues.get(i), Issue.class));
+            return allClosedIssues;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     public ArrayList<Ticket> getAllTickets(){
         try{
             final String URl = "http://localhost:8080/ticket/getall";
@@ -346,9 +429,20 @@ public class Client {
         }
     }
 
-
-    public static void main(String[] args) throws IOException {
-        //new Client().login("test", "testiing");
-       // System.out.println(run("http://localhost:8080/issue/getall"));
+    public ArrayList<Issue> getIssuesOfUser(String userId){
+        try{
+            final String URl = "http://localhost:8080/userissue/getuserissuesof/" + userId;
+            String responseBody = run(URl);
+            ArrayList<Issue> issuesOfUser = new ArrayList<>();
+            Gson g = new Gson();
+            JsonArray issues = (JsonArray) JsonParser.parseString(responseBody);
+            for(int i = 0; i < issues.size(); i++)
+                issuesOfUser.add(g.fromJson(issues.get(i), Issue.class));
+            return issuesOfUser;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
+
 }
