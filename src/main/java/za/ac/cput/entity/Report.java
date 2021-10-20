@@ -7,7 +7,7 @@ package za.ac.cput.entity;
 */
 
 public class Report {
-    private String reportId, reportAuth, reportDate;
+    private String reportId, reportAuth, reportDate, report;
 
 
     private Report(){}
@@ -16,10 +16,15 @@ public class Report {
         this.reportId = builder.reportId;
         this.reportAuth = builder.reportAuth;
         this.reportDate = builder.reportDate;
+        this.report = builder.report;
     }
 
     public String getReportId() {
         return reportId;
+    }
+
+    public String getReport() {
+        return report;
     }
 
     public String getReportAuth() {
@@ -36,16 +41,22 @@ public class Report {
         return "Report{" +
                 "reportId=" + reportId +
                 ", reportAuth=" + reportAuth +
+                ", report=" + report +
                 ", reportDate=" + reportDate +
                 '}';
     }
 
 
     public static class Builder {
-        private String reportId, reportAuth, reportDate;
+        private String reportId, reportAuth, reportDate, report;
 
         public Builder setReportId(String reportId) {
             this.reportId = reportId;
+            return this;
+        }
+
+        public Builder setReport(String report) {
+            this.report = report;
             return this;
         }
 
@@ -63,6 +74,7 @@ public class Report {
             this.reportId = report.reportId;
             this.reportAuth = report.reportAuth;
             this.reportDate = report.reportDate;
+            this.report = report.report;
             return this;
         }
 
