@@ -47,6 +47,8 @@ public class AuditClient extends JFrame implements ActionListener {
     private ArrayList<Issue> allOpenIssues, allMyIssues;
     private Issue selectedIssue;
     private Report selectedIssueReport;
+    private JTextField logInFormEmail;
+    private JPasswordField logInFormPassword;
 
     private AuditClient() {
         this.setPreferredSize(new Dimension(700,400));
@@ -93,8 +95,7 @@ public class AuditClient extends JFrame implements ActionListener {
         this.setVisible(true);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        //userUI();
-        //auditorUI();
+
         loginForm();
     }
 
@@ -106,6 +107,8 @@ public class AuditClient extends JFrame implements ActionListener {
         JPanel pnlRadio = new JPanel();
         JPanel pnlBottom = new JPanel();
         JLabel lblLoginType = new JLabel("Account: ");
+        logInFormEmail = new JTextField();
+        logInFormPassword = new JPasswordField();
 
         pnlTop.setLayout(new GridLayout(3,2));
         pnlRadio.setLayout(new GridLayout(1,2));
@@ -116,16 +119,16 @@ public class AuditClient extends JFrame implements ActionListener {
         loginType.add(rbtnUser);
 
         pnlTop.add(lblUsername);
-        pnlTop.add(txfUsername);
+        pnlTop.add(logInFormEmail);
         pnlTop.add(lblPassword);
-        pnlTop.add(pfPassword);
+        pnlTop.add(logInFormPassword);
         pnlRadio.add(rbtnAuditor);
         pnlRadio.add(rbtnUser);
         pnlTop.add(lblLoginType);
         pnlTop.add(pnlRadio);
         pnlBottom.add(btnSignIn);
 
-        txfUsername.requestFocus();
+        logInFormEmail.requestFocus();
 
         loginFrame.add(pnlTop, BorderLayout.NORTH);
         loginFrame.add(pnlBottom, BorderLayout.SOUTH);
@@ -180,9 +183,9 @@ public class AuditClient extends JFrame implements ActionListener {
     }
 
     private void clearLoginForm(){
-        txfUsername.setText("");
-        pfPassword.setText("");
-        txfUsername.requestFocus();
+        logInFormEmail.setText("");
+        logInFormPassword.setText("");
+        logInFormEmail.requestFocus();
     }
 
     private void signOut(){
@@ -554,14 +557,15 @@ public class AuditClient extends JFrame implements ActionListener {
     }
 
     private void loginAttempt(){
-        //System.out.println("Signing in: " + txfUsername.getText());
-        String pass = new String(pfPassword.getPassword());
-        //System.out.println("With Password: " + pass);
-        if(txfUsername.getText().isEmpty() || pass.isEmpty()) {
+        String pass = new String(logInFormPassword.getPassword());
+        if(logInFormEmail.getText().isEmpty() || pass.isEmpty()) {
         }
         else {
-            signedInUser = server.login("test25", txfUsername.getText(), pass); //Auditor -->test25  USER -->tt23
-            if(signedInUser.getLoginStatus() < 0){
+            signedInUser = server.login(logInFormEmail.getText(), pass); //Auditor -->test25  USER -->tt23
+            if(signedInUser == null){
+                JOptionPane.showMessageDialog(loginFrame, "Account Does Not exist!!");
+            }
+            else if(signedInUser.getLoginStatus() < 0){
                 JOptionPane.showMessageDialog(this, "Account is Block");
             }
             else if(rbtnUser.isSelected()) {

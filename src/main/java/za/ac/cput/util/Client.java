@@ -57,15 +57,12 @@ public class Client {
         }
     }
 
-    public UserAccount login(String id, String email, String password){
+    public UserAccount login(String email, String password){
         try{
-
-            //final String URl = "http://localhost:8080/useraccount/login/" + email + "/" + password;
-            final String URl = "http://localhost:8080/useraccount/read/" + id;
+            final String URl = "http://localhost:8080/useraccount/login/" + email + "/" + password;
             String responseBody = run(URl);
-
             Gson g = new Gson();
-            UserAccount userAccount = g.fromJson(responseBody.toString(), UserAccount.class);
+            UserAccount userAccount = g.fromJson(responseBody, UserAccount.class);
             return userAccount;
         } catch (Exception e) {
             e.printStackTrace();
