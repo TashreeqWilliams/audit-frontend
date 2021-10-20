@@ -1,6 +1,5 @@
 package za.ac.cput.views;
 
-import jdk.nashorn.internal.scripts.JO;
 import za.ac.cput.entity.*;
 import za.ac.cput.factory.*;
 import za.ac.cput.util.Client;
@@ -8,8 +7,6 @@ import okhttp3.*;
 
 import javax.swing.*;
 import javax.swing.border.Border;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -63,7 +60,7 @@ public class AuditClient extends JFrame implements ActionListener {
         pfPassword = new JPasswordField();
 
         lblHeading = new JLabel("sign in required");
-        lblUsername = new JLabel("Username: ");
+        lblUsername = new JLabel("Email: ");
         lblPassword = new JLabel("Password: ");
 
         rbtnAuditor = new JRadioButton("auditor");
@@ -984,7 +981,6 @@ public class AuditClient extends JFrame implements ActionListener {
 
         }
     }
-
 
 }
 
