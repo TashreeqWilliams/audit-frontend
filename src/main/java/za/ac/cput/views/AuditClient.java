@@ -3,7 +3,6 @@ package za.ac.cput.views;
 import za.ac.cput.entity.*;
 import za.ac.cput.factory.*;
 import za.ac.cput.util.Client;
-import okhttp3.*;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -19,8 +18,6 @@ import java.util.*;
 
 
 public class AuditClient extends JFrame implements ActionListener {
-    public static final MediaType JSON = MediaType.get("application/json; charset=utf-8");
-    public static OkHttpClient client = new OkHttpClient();
 
     private JFrame loginFrame;
     private JPanel pnlNorth, pnlWest, pnlEast, pnlSouth, pnlCenter;
@@ -37,9 +34,9 @@ public class AuditClient extends JFrame implements ActionListener {
     private static JTable table;
     private static DefaultTableModel tableModel;
     private JList navList;
-    private UserAccount signedInUser;
+    private UserAccount signedInUser, foundUserAccount;
     private Client server;
-    private UniversityStaff user;
+    private UniversityStaff user, foundUser;
     private Auditor auditor;
     private ArrayList<Issue> allOpenIssues, allMyIssues;
     private Issue selectedIssue;
@@ -166,15 +163,18 @@ public class AuditClient extends JFrame implements ActionListener {
             findUser();
         }
         if(actionEvent.getSource() == submitButton) {
-            try{
-                server.deleteUser(txtSearch.getText());
-                JOptionPane.showMessageDialog(this, "User deleted!");
-                txtSearch.setText("");
-                txtEmail.setText("");
-                txtUsername.setText("");
+            try {
+                UserAccount blockUser = server.blockUser(foundUser.getStaffID());
+                if (blockUser != null) {
+                    JOptionPane.showMessageDialog(this, "User Blocked!");
+                    txtSearch.setText("");
+                    txtEmail.setText("");
+                    txtUsername.setText("");
+                } else
+                    JOptionPane.showMessageDialog(this, "User NOT Blocked!");
             }
             catch (Exception e){
-                JOptionPane.showMessageDialog(this, "User NOT deleted!");
+                JOptionPane.showMessageDialog(this, "User NOT Blocked!");
             }
         }
     }
@@ -208,6 +208,7 @@ public class AuditClient extends JFrame implements ActionListener {
         pnlSouth.removeAll();
         pnlWest.add(navList);
         userNavListSelection();
+        pnlCenter.updateUI();
         pnlWest.updateUI();
     }
 
@@ -220,6 +221,7 @@ public class AuditClient extends JFrame implements ActionListener {
         pnlSouth.removeAll();
         pnlWest.add(navList);
         auditorNavListSelection();
+        pnlCenter.updateUI();
         pnlWest.updateUI();
     }
 
@@ -563,7 +565,7 @@ public class AuditClient extends JFrame implements ActionListener {
                 JOptionPane.showMessageDialog(loginFrame, "Account Does Not exist!!");
             }
             else if(signedInUser.getLoginStatus() < 0){
-                JOptionPane.showMessageDialog(this, "Account is Block");
+                JOptionPane.showMessageDialog(loginFrame, "Account is Block");
             }
             else if(rbtnUser.isSelected()) {
                 try{
@@ -615,7 +617,7 @@ public class AuditClient extends JFrame implements ActionListener {
         cmbIssueArea = new JComboBox(areas);
         btnCreateNewIssue = new JButton("raise issue");
         pnlCenter.setLayout(new GridLayout(4,1));
-        pnlSouth.setLayout(new GridLayout(1,2));
+        JPanel pnlSouthData = new JPanel(new GridLayout(1,2));
 
         JLabel lblConfirm = new JLabel("Submit here >> ");
 
@@ -627,9 +629,9 @@ public class AuditClient extends JFrame implements ActionListener {
         pnlCenter.add(txfTodayDate);
 
         lblConfirm.setHorizontalAlignment(JLabel.RIGHT);
-        pnlSouth.add(lblConfirm);
-        pnlSouth.add(btnCreateNewIssue);
-        pnlCenter.add(pnlSouth);
+        pnlSouthData.add(lblConfirm);
+        pnlSouthData.add(btnCreateNewIssue);
+        pnlCenter.add(pnlSouthData);
 
         txfTodayDate.setText(todayDate());
         txfTodayDate.setEnabled(false);
@@ -638,7 +640,6 @@ public class AuditClient extends JFrame implements ActionListener {
         btnCreateNewIssue.setPreferredSize(new Dimension(25,25));
 
         btnCreateNewIssue.addActionListener(this);
-        pnlSouth.updateUI();
         pnlCenter.updateUI();
     }
 
@@ -647,26 +648,29 @@ public class AuditClient extends JFrame implements ActionListener {
             JOptionPane.showMessageDialog(this, "Please Describe your Issue.");
             txaReport.requestFocus();
         }
-        try {
-            Issue newIssue = IssueFactory.createIssue(txaReport.getText(), cmbIssueArea.getSelectedItem().toString(), todayDate(), "NA", 1, -1, -1);
-            Issue response = server.createIssue(newIssue);
-            Ticket newTicket = TicketFactory.buildTicket(response.getIssueId(), response.getIssueDescription(), response.getIssueRaisedDate());
-            Ticket tResponse = server.createTicket(newTicket);
-            Report newReport = ReportFactory.createReport(tResponse.getTicketId(), "NA", "**empty**","NA");
-            Report rResponse = server.createReport(newReport);
-            UserIssue userIssue = UserIssueFactory.createUserIssue(user.getStaffID(), response.getIssueId());
-            server.createUserIssue(userIssue);
-            JOptionPane.showMessageDialog(this, "Issue Recorded. Auditor will reply in due.\nThank you.");
-            txaReport.setText("");
-            cmbIssueArea.setSelectedIndex(0);
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Some Unknown error occurred while creating new Issue");
+        else {
+            try {
+                Issue newIssue = IssueFactory.createIssue(txaReport.getText(), cmbIssueArea.getSelectedItem().toString(), todayDate(), "NA", 1, -1, -1);
+                Issue response = server.createIssue(newIssue);
+                Ticket newTicket = TicketFactory.buildTicket(response.getIssueId(), response.getIssueDescription(), response.getIssueRaisedDate());
+                Ticket tResponse = server.createTicket(newTicket);
+                Report newReport = ReportFactory.createReport(tResponse.getTicketId(), "NA", "**empty**", "NA");
+                Report rResponse = server.createReport(newReport);
+                UserIssue userIssue = UserIssueFactory.createUserIssue(user.getStaffID(), response.getIssueId());
+                server.createUserIssue(userIssue);
+                JOptionPane.showMessageDialog(this, "Issue Recorded. Auditor will reply in due.\nThank you.");
+                txaReport.setText("");
+                cmbIssueArea.setSelectedIndex(0);
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(this, "Some Unknown error occurred while creating new Issue");
+            }
         }
     }
 
     private void viewAllTicketsUI () {
         pnlSouth.removeAll();
         pnlCenter.removeAll();
+        pnlEast.removeAll();
         pnlCenter.setLayout(new GridLayout(3, 1));
 
         JLabel AllIssues = new JLabel("All Tickets");
@@ -928,7 +932,7 @@ public class AuditClient extends JFrame implements ActionListener {
         pnlTop.setLayout(new GridLayout(5,2));
         pnlBottom.setLayout(new GridLayout(5,1));
 
-        JLabel lblUsername = new JLabel("Username:");
+        JLabel lblUsername = new JLabel("Email:");
         JLabel lblEmail = new JLabel("Lastname:");
         JLabel lblSpace = new JLabel();
         JLabel lblSpace1 = new JLabel();
@@ -966,11 +970,14 @@ public class AuditClient extends JFrame implements ActionListener {
             JOptionPane.showMessageDialog(this, "NO ID provided");
         else{
             try{
-                UniversityStaff foundUser = server.getUser(txtSearch.getText());
-                if(foundUser != null){
-                    txtEmail.setText(foundUser.getStaffSurname());
-                    txtUsername.setText(foundUser.getStaffFirstName());
-                    submitButton.setEnabled(true);
+                foundUserAccount = server.getUserAccount(txtSearch.getText());
+                if(foundUserAccount != null){
+                    foundUser = server.getUser(foundUserAccount.getUserId());
+                    if(foundUser != null){
+                        txtEmail.setText(foundUser.getStaffSurname());
+                        txtUsername.setText(foundUser.getStaffFirstName());
+                        submitButton.setEnabled(true);
+                    }
                 }
                 else
                     JOptionPane.showMessageDialog(this, "No such User Account exist!");

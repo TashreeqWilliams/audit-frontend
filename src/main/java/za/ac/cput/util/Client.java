@@ -116,6 +116,20 @@ public class Client {
         return null;
     }
 
+    public UserAccount getUserAccount(String email){
+        try{
+            final String URl = "http://localhost:8080/useraccount/readbyemail/" + email;
+            String responseBody = run(URl);
+
+            Gson g = new Gson();
+            UserAccount userAccount = g.fromJson(responseBody.toString(), UserAccount.class);
+            return userAccount;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     public UserAccount createUserAccount(UserAccount userAccount){
         try{
             final String URl = "http://localhost:8080/useraccount/create";
@@ -436,6 +450,20 @@ public class Client {
             for(int i = 0; i < issues.size(); i++)
                 issuesOfUser.add(g.fromJson(issues.get(i), Issue.class));
             return issuesOfUser;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public UserAccount blockUser(String id){
+        try{
+            final String URl = "http://localhost:8080/useraccount/blockuser/" + id;
+            String responseBody = run(URl);
+
+            Gson g = new Gson();
+            UserAccount userAccount = g.fromJson(responseBody.toString(), UserAccount.class);
+            return userAccount;
         } catch (Exception e) {
             e.printStackTrace();
             return null;
